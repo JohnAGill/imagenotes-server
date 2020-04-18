@@ -16,8 +16,8 @@ const client = {
   keepAlive: true,
 };
 
-//@ts-ignore
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+// @ts-ignore
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
 interface CreateNoteType {
   picture: string;
