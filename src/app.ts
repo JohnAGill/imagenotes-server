@@ -1,7 +1,10 @@
 import express from 'express';
 import graphqlHTTP from 'express-graphql';
 import pgp from 'pg-promise';
-import { GraphQLObjectType, GraphQLString, GraphQLInt, buildSchema } from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, buildSchema } from 'graphql';
+import createUser from './user/createUser';
+import getUser from './user/getUser';
+import createNote from './notes/createNote';
 
 const client = {
   user: 'wckkrecpthxsyj',
@@ -16,56 +19,98 @@ const client = {
 //@ts-ignore
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
-const UserType = new GraphQLObjectType({
-  name: 'User',
-  fields: () => ({
-    userName: { type: GraphQLString },
-    email: { type: GraphQLString },
-    uid: { type: GraphQLString },
-    id: { type: GraphQLInt },
-  }),
-});
+interface CreateNoteType {
+  picture: string;
+  uid: string;
+  notes: [
+    {
+      value: string;
+      location: {
+        x: number;
+        y: number;
+      };
+      uid: string;
+    },
+  ];
+}
 
-var schema = buildSchema(`
+const LocationType = `
+  input Location {
+    x: Int,
+    y: Int
+  }
+`;
+
+const NoteType = `
+  input Note {
+    value: String,
+    uid: String,
+    location: Location
+  }
+`;
+
+const CreateNoteType = `
+  input CreateNote {
+    picture: String,
+    uid: String,
+    notes: [Note]
+  }
+`;
+
+const schema = buildSchema(`
+  ${LocationType}
+  ${NoteType}
+  ${CreateNoteType}
   type User {
-      userName: String,
-      email: String,
-      uid: String,
-      id: Int
-    }
+    userName: String,
+    email: String,
+    uid: String,
+  }
   type Query {
-    user: [User]
+    createUser(email: String, userName: String, uid: String): Boolean,
+    getUser(id: String): User,
+    createNote(note: CreateNote): Boolean
   }
 `);
 
-const db = pgp()(client);
-
-const query = `SELECT * FROM public.users`;
-const testData = async () => {
-  try {
-    const data = await db.any(query);
-    console.log(data);
-    return data;
-  } catch (error) {
-    console.log(error.message);
-  }
-};
+const db = pgp({ capSQL: true })(client);
 
 const app = express();
 
+const dumyNotes = {
+  value: 'test',
+  x: 3,
+  y: 100,
+  noteUid: 'test11',
+};
+
+const dumyNote = {
+  picture: 'test',
+  uid: 'test11',
+  notes: [dumyNotes, dumyNotes, dumyNotes],
+};
+
 const root = {
-  user: async () => {
-    const ll = await testData();
-    return ll;
+  createUser: async (args) => {
+    const result = await createUser(db, args);
+    return result;
+  },
+  getUser: async (args) => {
+    const result = await getUser(db, args.id);
+    return result;
+  },
+  createNote: async (args) => {
+    const result = await createNote(db, dumyNote);
+    return result;
   },
 };
 
 app.use(
-  '/graphql',
+  '/api',
   graphqlHTTP({
     schema: schema,
     rootValue: root,
     graphiql: true,
   }),
 );
-app.listen(4000, () => console.log('Now browse to localhost:4000/graphql'));
+app.listen(4000, () => console.log('Now browse to localhost:4000/api'));
