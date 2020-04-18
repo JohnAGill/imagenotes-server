@@ -1,7 +1,7 @@
 import express from 'express';
 import graphqlHTTP from 'express-graphql';
 import pgp from 'pg-promise';
-import { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, buildSchema } from 'graphql';
+import { buildSchema } from 'graphql';
 import createUser from './user/createUser';
 import getUser from './user/getUser';
 import createNote from './notes/createNote';
