@@ -5,6 +5,7 @@ import { buildSchema } from 'graphql';
 import createUser from './user/createUser';
 import getUser from './user/getUser';
 import createNote from './notes/createNote';
+import getNotes from './notes/getNotes';
 
 const client = {
   user: 'wckkrecpthxsyj',
@@ -34,33 +35,49 @@ interface CreateNoteType {
   ];
 }
 
-const LocationType = `
-  input Location {
-    x: Int,
-    y: Int
-  }
-`;
-
-const NoteType = `
-  input Note {
+const NoteInput = `
+  input NoteInput {
     value: String,
-    uid: String,
-    location: Location
+    note_uid: String,
+    x: Int,
+    y: Int,
+    order: Int
   }
 `;
 
-const CreateNoteType = `
-  input CreateNote {
+const CreateNoteInput = `
+  input CreateNoteInput {
     picture: String,
+    uid: String,
+    notes: [NoteInput],
+    user_id: String
+  }
+`;
+
+const NotesType = `
+  type Notes {
+    picture: String,
+    user_id: String,
     uid: String,
     notes: [Note]
   }
 `;
 
+const NoteType = `
+  type Note {
+    value: String,
+    note_uid: String,
+    x: Int,
+    y: Int,
+    order: Int
+  }
+`;
+
 const schema = buildSchema(`
-  ${LocationType}
+  ${NoteInput}
+  ${CreateNoteInput}
   ${NoteType}
-  ${CreateNoteType}
+  ${NotesType}
   type User {
     userName: String,
     email: String,
@@ -69,26 +86,14 @@ const schema = buildSchema(`
   type Query {
     createUser(email: String, userName: String, uid: String): Boolean,
     getUser(id: String): User,
-    createNote(note: CreateNote): Boolean
+    createNote(note: CreateNoteInput): Boolean,
+    getNotes(userId: String): [Notes]
   }
 `);
 
 const db = pgp({ capSQL: true })(client);
 
 const app = express();
-
-const dumyNotes = {
-  value: 'test',
-  x: 3,
-  y: 100,
-  noteUid: 'test11',
-};
-
-const dumyNote = {
-  picture: 'test',
-  uid: 'test11',
-  notes: [dumyNotes, dumyNotes, dumyNotes],
-};
 
 const root = {
   createUser: async (args) => {
@@ -100,7 +105,12 @@ const root = {
     return result;
   },
   createNote: async (args) => {
-    const result = await createNote(db, dumyNote);
+    console.log(args);
+    const result = await createNote(db, args.note);
+    return result;
+  },
+  getNotes: async (args) => {
+    const result = await getNotes(db, args.userId);
     return result;
   },
 };
