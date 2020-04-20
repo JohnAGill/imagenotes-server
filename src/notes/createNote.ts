@@ -4,7 +4,7 @@ export default async (db: any, note: any) => {
   const pgpRun = pgp({
     capSQL: true,
   });
-  const cs = new pgpRun.helpers.ColumnSet(['value', 'note_uid', 'x', 'y', 'order'], { table: { table: 'note', schema: 'public' } });
+  const cs = new pgpRun.helpers.ColumnSet(['value', 'note_uid', 'x', 'y', 'order', 'uid'], { table: { table: 'note', schema: 'public' } });
   const notesQuery = `INSERT INTO public.notes(
 	"picture", "uid", "user_id")
   VALUES ($(values.picture), $(values.uid), $(values.user_id));`;

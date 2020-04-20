@@ -6,6 +6,7 @@ import createUser from './user/createUser';
 import getUser from './user/getUser';
 import createNote from './notes/createNote';
 import getNotes from './notes/getNotes';
+import updateNote from './notes/updateNote';
 
 const client = {
   user: 'wckkrecpthxsyj',
@@ -41,7 +42,8 @@ const NoteInput = `
     note_uid: String,
     x: Int,
     y: Int,
-    order: Int
+    order: Int,
+    uid: String
   }
 `;
 
@@ -51,6 +53,13 @@ const CreateNoteInput = `
     uid: String,
     notes: [NoteInput],
     user_id: String
+  }
+`;
+
+const UpdateNoteInput = `
+  input UpdateNoteInput {
+   uid: String,
+   text: String
   }
 `;
 
@@ -69,7 +78,8 @@ const NoteType = `
     note_uid: String,
     x: Int,
     y: Int,
-    order: Int
+    order: Int,
+    uid: String
   }
 `;
 
@@ -78,6 +88,7 @@ const schema = buildSchema(`
   ${CreateNoteInput}
   ${NoteType}
   ${NotesType}
+  ${UpdateNoteInput}
   type User {
     userName: String,
     email: String,
@@ -87,7 +98,8 @@ const schema = buildSchema(`
     createUser(email: String, userName: String, uid: String): Boolean,
     getUser(id: String): User,
     createNote(note: CreateNoteInput): Boolean,
-    getNotes(userId: String): [Notes]
+    getNotes(userId: String): [Notes],
+    updateNote(uid: String, text: String): Boolean
   }
 `);
 
@@ -105,13 +117,16 @@ const root = {
     return result;
   },
   createNote: async (args) => {
-    console.log(args);
     const result = await createNote(db, args.note);
     return result;
   },
   getNotes: async (args) => {
     const result = await getNotes(db, args.userId);
     return result;
+  },
+  updateNote: async (args) => {
+    const results = await updateNote(db, args);
+    return results;
   },
 };
 
