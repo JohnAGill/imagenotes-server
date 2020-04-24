@@ -95,40 +95,6 @@ const db = pgp({ capSQL: true })(client);
 
 const app = express();
 
-/*const root =  (request) => {
-  console.log(request.body.args)
-  console.log('here')
-  if (request.body.args.path === 'createUser') {
-    return () => {
-    const result = createUser(db, request.body.args);
-    return result;
-    }
-  } else if (request.body.args.path === 'getUser') {
-    return () => {
-    const result = getUser(db, request.body.args.id);
-    return result;
-    }
-  } else if (request.body.args.path === 'createNote') {
-    return () => {
-    const result = createNote(db, request.body.args.note);
-    return result;
-    }
-  }
-  if (request.body.args.path === 'getNotes') {
-    console.log('getNotes')
-    return async () => {
-    const result = await getNotes(db, request.body.args.userId);
-    return result;
-    }
-  }
-  if (request.body.args.path === 'updateNote') {
-    return () => {
-    const results =  updateNote(db, request.body.args);
-    return results
-    }
-  }
-};*/
-
 const root = {
   createUser: async (args) => {
     const result = await createUser(db, args);
