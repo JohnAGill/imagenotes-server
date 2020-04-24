@@ -1,4 +1,7 @@
 import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+
 import graphqlHTTP from 'express-graphql';
 import pgp from 'pg-promise';
 import { buildSchema } from 'graphql';
@@ -20,21 +23,6 @@ const client = {
 
 // @ts-ignore
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
-interface CreateNoteType {
-  picture: string;
-  uid: string;
-  notes: [
-    {
-      value: string;
-      location: {
-        x: number;
-        y: number;
-      };
-      uid: string;
-    },
-  ];
-}
 
 const NoteInput = `
   input NoteInput {
@@ -98,7 +86,7 @@ const schema = buildSchema(`
     createUser(email: String, userName: String, uid: String): Boolean,
     getUser(id: String): User,
     createNote(note: CreateNoteInput): Boolean,
-    getNotes(userId: String): [Notes],
+    getNotes(userId: String, path: String): [Notes],
     updateNote(uid: String, text: String): Boolean
   }
 `);
@@ -125,17 +113,21 @@ const root = {
     return result;
   },
   updateNote: async (args) => {
-    const results = await updateNote(db, args);
+    const results = updateNote(db, args.update);
     return results;
   },
 };
 
+const port = process.env.PORT || 4000;
+
 app.use(
   '/api',
+  bodyParser.json(),
+  cors(),
   graphqlHTTP({
     schema: schema,
     rootValue: root,
     graphiql: true,
   }),
 );
-app.listen(4000, () => console.log('Now browse to localhost:4000/api'));
+app.listen(port, () => console.log('Now browse to localhost:4000/api'));
