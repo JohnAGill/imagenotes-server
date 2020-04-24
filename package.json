@@ -6,11 +6,13 @@
   "author": "John Gill",
   "main": "app.ts",
   "scripts": {
+    "build-ts": "tsc",
     "format:js": "npm run prettier -- \"src/**/*.ts\"",
+    "postinstall": "npm run build-ts",
     "lint": "eslint ./src --ext=ts",
     "lint:fix": "eslint ./src --ext=ts, --fix",
     "prettier": "prettier --single-quote --trailing-comma all --print-width 180 --bracket-spacing --write",
-    "start": "yarn install && tsc && node dist/app.js",
+    "start": "node dist/app.js",
     "start:local": "tsc && node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -57,5 +59,8 @@
     "prettier": "^2.0.4",
     "sort-package-json": "^1.41.0",
     "tslint": "^6.1.1"
+  },
+  "engines": {
+    "node": "13.8.0"
   }
 }

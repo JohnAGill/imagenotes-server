@@ -118,6 +118,8 @@ const root = {
   },
 };
 
+const port = process.env.PORT || 4000;
+
 app.use(
   '/api',
   bodyParser.json(),
@@ -128,3 +130,4 @@ app.use(
     graphiql: true,
   }),
 );
+app.listen(port, () => console.log('Now browse to localhost:4000/api'));
