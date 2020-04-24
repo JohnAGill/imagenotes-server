@@ -7,11 +7,11 @@
   "main": "app.ts",
   "scripts": {
     "format:js": "npm run prettier -- \"src/**/*.ts\"",
-    "heroku-start": "yarn install && tsc && node dist/app.js",
     "lint": "eslint ./src --ext=ts",
     "lint:fix": "eslint ./src --ext=ts, --fix",
     "prettier": "prettier --single-quote --trailing-comma all --print-width 180 --bracket-spacing --write",
-    "start": "tsc && node dist/app.js",
+    "start": "yarn install && tsc && node dist/app.js",
+    "start:local": "tsc && node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "husky": {
