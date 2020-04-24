@@ -10,5 +10,4 @@ GROUP BY notes.uid`;
     console.log(error);
     return false;
   }
-  return true;
 };

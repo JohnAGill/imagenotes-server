@@ -10,8 +10,11 @@ export default async (db: any, note: any) => {
   VALUES ($(values.picture), $(values.uid), $(values.user_id));`;
   const test = pgpRun.helpers.insert(note.notes, cs);
   try {
+    console.log('wow');
     await db.none(notesQuery, { values: note });
+    console.log('big wow');
     await db.none(test);
+    console.log('mega wow');
   } catch (error) {
     console.log(error);
     return false;

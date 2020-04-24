@@ -1,5 +1,4 @@
 export default async (db: any, values: any) => {
-  console.log(values);
   const notesQuery = `UPDATE public.note
     SET  value = $(update.text)
     WHERE  uid = $(update.uid)

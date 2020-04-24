@@ -1,4 +1,7 @@
 import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+
 import graphqlHTTP from 'express-graphql';
 import pgp from 'pg-promise';
 import { buildSchema } from 'graphql';
@@ -20,21 +23,6 @@ const client = {
 
 // @ts-ignore
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
-interface CreateNoteType {
-  picture: string;
-  uid: string;
-  notes: [
-    {
-      value: string;
-      location: {
-        x: number;
-        y: number;
-      };
-      uid: string;
-    },
-  ];
-}
 
 const NoteInput = `
   input NoteInput {
@@ -98,7 +86,7 @@ const schema = buildSchema(`
     createUser(email: String, userName: String, uid: String): Boolean,
     getUser(id: String): User,
     createNote(note: CreateNoteInput): Boolean,
-    getNotes(userId: String): [Notes],
+    getNotes(userId: String, path: String): [Notes],
     updateNote(uid: String, text: String): Boolean
   }
 `);
@@ -106,6 +94,40 @@ const schema = buildSchema(`
 const db = pgp({ capSQL: true })(client);
 
 const app = express();
+
+/*const root =  (request) => {
+  console.log(request.body.args)
+  console.log('here')
+  if (request.body.args.path === 'createUser') {
+    return () => {
+    const result = createUser(db, request.body.args);
+    return result;
+    }
+  } else if (request.body.args.path === 'getUser') {
+    return () => {
+    const result = getUser(db, request.body.args.id);
+    return result;
+    }
+  } else if (request.body.args.path === 'createNote') {
+    return () => {
+    const result = createNote(db, request.body.args.note);
+    return result;
+    }
+  }
+  if (request.body.args.path === 'getNotes') {
+    console.log('getNotes')
+    return async () => {
+    const result = await getNotes(db, request.body.args.userId);
+    return result;
+    }
+  }
+  if (request.body.args.path === 'updateNote') {
+    return () => {
+    const results =  updateNote(db, request.body.args);
+    return results
+    }
+  }
+};*/
 
 const root = {
   createUser: async (args) => {
@@ -125,13 +147,15 @@ const root = {
     return result;
   },
   updateNote: async (args) => {
-    const results = await updateNote(db, args);
+    const results = updateNote(db, args.update);
     return results;
   },
 };
 
 app.use(
   '/api',
+  bodyParser.json(),
+  cors(),
   graphqlHTTP({
     schema: schema,
     rootValue: root,
