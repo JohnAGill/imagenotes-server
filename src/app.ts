@@ -28,8 +28,8 @@ const NoteInput = `
   input NoteInput {
     value: String,
     note_uid: String,
-    x: Int,
-    y: Int,
+    x: Float,
+    y: Float,
     order: Int,
     uid: String
   }
@@ -46,8 +46,7 @@ const CreateNoteInput = `
 
 const UpdateNoteInput = `
   input UpdateNoteInput {
-   uid: String,
-   text: String
+   notes: [NoteInput]
   }
 `;
 
@@ -64,8 +63,8 @@ const NoteType = `
   type Note {
     value: String,
     note_uid: String,
-    x: Int,
-    y: Int,
+    x: Float,
+    y: Float,
     order: Int,
     uid: String
   }
@@ -87,7 +86,7 @@ const schema = buildSchema(`
     getUser(id: String): User,
     createNote(note: CreateNoteInput): Boolean,
     getNotes(userId: String, path: String): [Notes],
-    updateNote(uid: String, text: String): Boolean
+    updateNote(notes: [NoteInput]): Boolean
   }
 `);
 
@@ -105,6 +104,7 @@ const root = {
     return result;
   },
   createNote: async (args) => {
+    console.log('createNotes');
     const result = await createNote(db, args.note);
     return result;
   },
@@ -113,7 +113,7 @@ const root = {
     return result;
   },
   updateNote: async (args) => {
-    const results = updateNote(db, args.update);
+    const results = updateNote(db, args.notes);
     return results;
   },
 };
