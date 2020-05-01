@@ -105,7 +105,6 @@ const root = {
     return result;
   },
   createNote: async (args) => {
-    console.log(args.note.notes);
     const result = await createNote(db, args.note);
     return result;
   },
