@@ -18,7 +18,6 @@ const client = {
   port: 5432,
   database: 'd99dch9cum4c6e',
   ssl: true,
-  keepAlive: true,
 };
 
 // @ts-ignore
@@ -31,7 +30,8 @@ const NoteInput = `
     x: Float,
     y: Float,
     order: Int,
-    uid: String
+    uid: String,
+    text_color: String
   }
 `;
 
@@ -67,6 +67,7 @@ const NoteType = `
     y: Float,
     order: Int,
     uid: String
+    text_color: String
   }
 `;
 
@@ -104,7 +105,7 @@ const root = {
     return result;
   },
   createNote: async (args) => {
-    console.log('createNotes');
+    console.log(args.note.notes);
     const result = await createNote(db, args.note);
     return result;
   },
